@@ -50,7 +50,7 @@ public class ProfileController {
                                     Principal principal) throws IOException {
         User usuario = userRepository.findByUsername(principal.getName()).orElse(null);
         if (usuario == null) {
-            return "redrect:/login";
+            return "redirect:/login";
         }
         
         usuario.setEmail(email);
@@ -60,16 +60,21 @@ public class ProfileController {
         }
         
         // En caso que el usuario escriba una nueva contraseña
-        if (password != null && !imagen.isEmpty()) {
+        if (password != null && !password.isBlank()) {
+            usuario.setPassword(passwordEncoder.encode(password));
+        }
+
+        // En caso que se envíe una nueva imagen
+        if (imagen != null && !imagen.isEmpty()) {
             Path uploadPath = Paths.get(uploadDir);
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
-            
-            String filename=principal.getName()+"_"+imagen.getOriginalFilename();
+
+            String filename = principal.getName() + "_" + imagen.getOriginalFilename();
             Path filePath = uploadPath.resolve(filename);
             Files.copy(imagen.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            
+
             usuario.setNombreImagen(filename);
         }
         

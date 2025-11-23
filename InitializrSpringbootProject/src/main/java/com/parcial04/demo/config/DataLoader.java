@@ -23,7 +23,14 @@ public class DataLoader {
     @Bean
     CommandLineRunner initUsers(UserRepository userRepository, PasswordEncoder encoder) {
         return args -> {
-            if (userRepository.findByUsername("admin").isEmpty()) {
+            // Intentar leer el usuario 'admin' desde la base de datos
+            var optAdmin = userRepository.findByUsername("admin");
+            if (optAdmin.isPresent()) {
+                User admin = optAdmin.get();
+                System.out.println("Usuario 'admin' cargado desde la base de datos: email=" + admin.getEmail());
+                // Si necesitas usar los datos de 'admin' para inicializar otra cosa,
+                // hazlo aquí.
+            } else {
                 User u = new User();
                 u.setUsername("admin");
                 u.setPassword(encoder.encode("12345")); // contraseña
